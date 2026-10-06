@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixed
+
+- The simulator now builds and runs on Linux hosts with GCC, fixing errors in generated web headers, third-party C code, and OpenSSL linking.
+
 ## [v1.6.1] - 2026-10-03
 
 ### Added
