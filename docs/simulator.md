@@ -5,7 +5,7 @@ nav_order: 15
 
 # Development Device Simulator
 
-CrossInk can run in the [CrossPoint simulator](https://github.com/uxjulia/crosspoint-simulator), which renders the e-ink display in an SDL2 window. Use it for quick sanity checks without flashing firmware every time.
+CrossInk can run in the [CrossInk simulator](https://github.com/uxjulia/crossink-simulator), which renders the e-ink display in an SDL2 window. Use it for quick sanity checks without flashing firmware every time.
 
 ## Platform Support
 
@@ -13,6 +13,14 @@ The simulator builds on macOS and Linux. `platformio.ini` takes the SDL2 compile
 
 - Linux host builds are configured by `scripts/simulator_host_toolchain.py`, which pins the C dialect for GCC 15+ and links OpenSSL for the simulator's MD5 helper.
 - Native Windows is not supported. Use WSL and follow the Linux setup.
+
+## Platform Origin
+
+The simulator environment is specific to CrossInk: the parent project, [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader), has no `[simulator-*]` env in `platformio.ini`. The pieces the Linux fixes touch come from three different places, so platform fixes have different homes upstream:
+
+- The `[simulator-*]` env, its flags (including the clang-only `-Wno-c++11-narrowing` spelling), and the generated web headers that trigger narrowing all live in this repository and were tested only on macOS with Apple clang.
+- The simulator's MD5 helper (`MD5Builder_linux.h` / `MD5Builder_mac.h`) lives in [uxjulia/crossink-simulator](https://github.com/uxjulia/crossink-simulator); Linux builds need `-lssl -lcrypto` because of this, and the clean fix would land there.
+- `ricmoo/QRCode` (pinned the same way in CrossPoint Reader) predates C23, where `bool` is a keyword; `scripts/simulator_host_toolchain.py` pins the host C dialect to `gnu17` to work around it. CrossInk does not accept pull requests, so upstream-facing changes should go to CrossPoint Reader or the respective library repos.
 
 ## Prerequisites
 
